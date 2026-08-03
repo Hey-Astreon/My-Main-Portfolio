@@ -22,3 +22,26 @@ export const sceneBus = {
     return () => listeners.delete(l);
   },
 };
+
+type ScrollListener = (progress: number, speed: number) => void;
+let scrollProgress = 0;
+let scrollSpeed = 0;
+const scrollListeners = new Set<ScrollListener>();
+
+export const scrollBus = {
+  get progress() {
+    return scrollProgress;
+  },
+  get speed() {
+    return scrollSpeed;
+  },
+  set(progress: number, speed: number) {
+    scrollProgress = progress;
+    scrollSpeed = speed;
+    scrollListeners.forEach((l) => l(progress, speed));
+  },
+  subscribe(l: ScrollListener) {
+    scrollListeners.add(l);
+    return () => scrollListeners.delete(l);
+  },
+};

@@ -1,6 +1,7 @@
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import { scrollBus } from "@/lib/scene-bus";
 import { TIER_PRESETS, type Tier } from "./useDeviceTier";
 
 const vertex = /* glsl */ `
@@ -104,6 +105,9 @@ const fragment = /* glsl */ `
 export function AnimusOrb({ dark, tier }: { dark: boolean; tier: Tier }) {
   const mesh = useRef<THREE.Mesh>(null);
   const mat = useRef<THREE.ShaderMaterial>(null);
+  const ring1 = useRef<THREE.Mesh>(null);
+  const ring2 = useRef<THREE.Mesh>(null);
+  const ring3 = useRef<THREE.Mesh>(null);
   const frameCount = useRef(0);
   const preset = TIER_PRESETS[tier];
   const detail = preset.orbDetail;
@@ -124,54 +128,76 @@ export function AnimusOrb({ dark, tier }: { dark: boolean; tier: Tier }) {
   );
 
   const easedMouse = useRef(new THREE.Vector2(0, 0));
+  const smoothProgress = useRef(0);
+  const smoothSpeed = useRef(0);
 
   useFrame((state, dt) => {
     frameCount.current++;
     const skip = skipEveryOther && frameCount.current % 2 === 0;
     const t = state.clock.elapsedTime;
 
+    // Smooth scroll interpolation
+    const targetProgress = scrollBus.progress;
+    const targetSpeed = scrollBus.speed;
+    smoothProgress.current += (targetProgress - smoothProgress.current) * 0.08;
+    smoothSpeed.current += (targetSpeed - smoothSpeed.current) * 0.1;
+
     if (mat.current) {
-      mat.current.uniforms.uTime.value = t;
+      mat.current.uniforms.uTime.value = t + smoothProgress.current * 2.0;
 
       if (!skip) {
         const target = state.pointer;
         easedMouse.current.x += (target.x - easedMouse.current.x) * 0.06;
         easedMouse.current.y += (target.y - easedMouse.current.y) * 0.06;
-        mat.current.uniforms.uMouseLen.value = easedMouse.current.length() * 0.6;
+        mat.current.uniforms.uMouseLen.value =
+          easedMouse.current.length() * 0.6 + Math.min(smoothSpeed.current * 0.02, 0.4);
 
         const a = mat.current.uniforms.uColorA.value as THREE.Color;
         const b = mat.current.uniforms.uColorB.value as THREE.Color;
-        // Light mode: deeper slate so orb reads as a solid presence on bone bg.
-        // Dark mode: soft charcoal with icy rim highlight.
         const targetA = dark ? new THREE.Color("#0f1116") : new THREE.Color("#3a4a5c");
         const targetB = dark ? new THREE.Color("#4a5566") : new THREE.Color("#5c728a");
         a.lerp(targetA, 0.05);
         b.lerp(targetB, 0.05);
-        mat.current.uniforms.uFresnelPow.value = dark ? 2.2 : 1.6;
+        mat.current.uniforms.uFresnelPow.value = dark ? 2.2 - smoothProgress.current * 0.4 : 1.6;
       }
     }
+
     if (mesh.current) {
-      mesh.current.rotation.y += dt * 0.08;
-      mesh.current.rotation.x = Math.sin(t * 0.2) * 0.15;
-      const s = 1 + Math.sin(t * 0.9) * 0.01;
+      mesh.current.rotation.y += dt * 0.08 + smoothSpeed.current * 0.001;
+      mesh.current.rotation.x = Math.sin(t * 0.2) * 0.15 + smoothProgress.current * 0.4;
+      const s = 1 + Math.sin(t * 0.9) * 0.01 + smoothProgress.current * 0.12;
       mesh.current.scale.setScalar(s);
+    }
+
+    // Dynamic torus ring rotations driven by scroll position
+    if (ring1.current) {
+      ring1.current.rotation.x = Math.PI / 2 + smoothProgress.current * Math.PI * 1.2;
+      ring1.current.rotation.y = smoothProgress.current * Math.PI * 0.5;
+    }
+    if (ring2.current) {
+      ring2.current.rotation.z = Math.PI / 3 + smoothProgress.current * Math.PI * 1.8;
+      ring2.current.rotation.x = smoothProgress.current * Math.PI * 0.8;
+    }
+    if (ring3.current) {
+      ring3.current.rotation.x = Math.PI / 4 + smoothProgress.current * Math.PI * 1.5;
+      ring3.current.rotation.z = Math.PI / 4 + smoothProgress.current * Math.PI * 0.9;
     }
   });
 
   return (
     <group>
-      <mesh rotation={[Math.PI / 2, 0, 0]}>
+      <mesh ref={ring1} rotation={[Math.PI / 2, 0, 0]}>
         <torusGeometry args={[2.4, 0.004, 16, 200]} />
         <meshBasicMaterial color="#7ec8e3" transparent opacity={0.35} />
       </mesh>
       {preset.halos >= 2 && (
-        <mesh rotation={[0, 0, Math.PI / 3]}>
+        <mesh ref={ring2} rotation={[0, 0, Math.PI / 3]}>
           <torusGeometry args={[2.55, 0.003, 16, 200]} />
           <meshBasicMaterial color={dark ? "#ffffff" : "#1a1a1c"} transparent opacity={0.25} />
         </mesh>
       )}
       {preset.halos >= 3 && (
-        <mesh rotation={[Math.PI / 4, Math.PI / 4, 0]}>
+        <mesh ref={ring3} rotation={[Math.PI / 4, Math.PI / 4, 0]}>
           <torusGeometry args={[2.7, 0.002, 16, 200]} />
           <meshBasicMaterial color={dark ? "#ffffff" : "#1a1a1c"} transparent opacity={0.15} />
         </mesh>

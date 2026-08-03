@@ -49,6 +49,16 @@ function useFps() {
   return fps;
 }
 
+import { scrollBus } from "@/lib/scene-bus";
+
+function useScrollProgress() {
+  const [p, setP] = useState(0);
+  useEffect(() => {
+    return scrollBus.subscribe((progress) => setP(Math.round(progress * 100)));
+  }, []);
+  return p;
+}
+
 export function HUD({
   theme,
   onToggleTheme,
@@ -58,6 +68,7 @@ export function HUD({
 }) {
   const utc = useUtcClock();
   const fps = useFps();
+  const scrollPct = useScrollProgress();
   const tier = useDeviceTier();
   const [section, setSection] = useState<SectionId>(sceneBus.current);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -105,6 +116,7 @@ export function HUD({
         <div className="flex items-center gap-2 md:gap-4">
           <div className="hidden items-center gap-4 xl:flex">
             <Telemetry k="STATUS" v="ONLINE" accent />
+            <Telemetry k="SCROLL" v={`${String(scrollPct).padStart(2, "0")}%`} />
             <Telemetry k="FPS" v={String(fps).padStart(2, "0")} />
             <Telemetry k="TIER" v={tier.toUpperCase()} />
             <Telemetry k="UTC" v={utc} />
