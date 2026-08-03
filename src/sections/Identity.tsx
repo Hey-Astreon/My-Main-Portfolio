@@ -166,7 +166,7 @@ function ProfileCard() {
         <span className="font-mono text-[10px] tracking-widest text-scan">AVAILABLE</span>
       </div>
 
-      <div className="relative mt-4 aspect-square w-full overflow-hidden border border-border bg-background">
+      <div className="relative mt-4 aspect-square w-full overflow-hidden rounded-full border border-border bg-background">
         <img
           src="/roushan.png"
           alt="Roushan Kumar — Systems Engineer portrait"
