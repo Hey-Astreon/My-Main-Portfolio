@@ -83,7 +83,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "keywords",
         content:
-          "Roushan Kumar, Astreon, Full Stack Software Developer, Backend Developer, FastAPI, .NET, Spring Boot, React, AI systems, portfolio",
+          "Roushan Kumar, Astreon, Backend Developer, Cloud Developer, Stride, Astra Vision, Alyra Lock, Next.js 16, FastAPI, Docker, Oracle Cloud, Redis 7, LibSQL, portfolio",
       },
       { property: "og:site_name", content: "ASTREON — Roushan Kumar" },
       { name: "theme-color", content: "#0a0a0b" },

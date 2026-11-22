@@ -140,10 +140,10 @@ function ProfileCard() {
   }, []);
 
   const rows: [string, string, boolean?][] = [
-    ["ROLE", "Systems Engineer"],
-    ["FOCUS", "Backend Architecture"],
-    ["STACK", "TypeScript · Python · React"],
-    ["CURRENT", "Building Astra Vision"],
+    ["ROLE", "Backend & Cloud Developer"],
+    ["FOCUS", "Distributed Systems & Cloud"],
+    ["STACK", "TypeScript · Python · Docker · OCI"],
+    ["CURRENT", "Building Stride & Astra Vision"],
     ["STATUS", "Open to Internships", true],
     ["LOCATION", "Patna, India"],
   ];
@@ -168,10 +168,10 @@ function ProfileCard() {
 
       <div className="relative mt-4 aspect-square w-full overflow-hidden rounded-full border border-border bg-background">
         <img
-          src="/roushan.png"
-          alt="Roushan Kumar — Systems Engineer portrait"
+          src="/roushan.jpg"
+          alt="Roushan Kumar — Backend & Cloud Developer portrait"
           className="absolute inset-0 h-full w-full object-cover"
-          style={{ filter: "grayscale(0.15) contrast(1.02)" }}
+          style={{ filter: "contrast(1.02)" }}
         />
         <div className="scan-line-loop" />
         <div

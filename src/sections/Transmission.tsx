@@ -180,8 +180,8 @@ export function Transmission() {
               { k: "GITHUB", v: "github.com/Hey-Astreon", href: "https://github.com/Hey-Astreon" },
               {
                 k: "LINKEDIN",
-                v: "in/roushan-kumar-ab4b19250",
-                href: "https://www.linkedin.com/in/roushan-kumar-ab4b19250/",
+                v: "in/astreon4547",
+                href: "https://linkedin.com/in/astreon4547",
               },
             ].map((c, i) => (
               <Magnetic key={c.k} label={c.k}>
