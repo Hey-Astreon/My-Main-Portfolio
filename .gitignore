@@ -33,4 +33,5 @@ dist-ssr
 
 # Backups & local scratch
 astreon-v5/
+.vercel/
 

@@ -19,7 +19,9 @@ export const sceneBus = {
   },
   subscribe(l: Listener) {
     listeners.add(l);
-    return () => listeners.delete(l);
+    return () => {
+      listeners.delete(l);
+    };
   },
 };
 
@@ -42,6 +44,8 @@ export const scrollBus = {
   },
   subscribe(l: ScrollListener) {
     scrollListeners.add(l);
-    return () => scrollListeners.delete(l);
+    return () => {
+      scrollListeners.delete(l);
+    };
   },
 };
